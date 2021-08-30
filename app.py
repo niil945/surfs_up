@@ -1,13 +1,13 @@
 import datetime as dt
 import numpy as np
-import pandas  as pd
+import pandas as pd
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 from flask import Flask, jsonify
 
-engine = create_engine("sqlite:///hawaii.sqlite")
+engine = create_engine("sqlite:///hawaii.sqlite", connect_args={'check_same_thread': False})
 Base = automap_base()
 Base.prepare(engine, reflect=True)
 Measurement = Base.classes.measurement
@@ -17,14 +17,14 @@ session = Session(engine)
 app = Flask(__name__)
 @app.route("/")
 def welcome():
-    return(
+    return (
     '''
-    Welcome to the Climate ANalysis API!\n
+    Welcome to the Hawaii Climate Analysis API!\n
     Available Routes:\n
     /api/v1.0/precipitation\n
     /api/v1.0/stations\n
-    /apiv1.0/tobs\n
-    /api/v1.0/temp/start/end
+    /api/v1.0/tobs\n
+    /api/v1.0/temp/start/end\n
     ''')
 @app.route("/api/v1.0/precipitation")
 def precipitation():
@@ -55,8 +55,8 @@ def stats(start=None, end=None):
         results = session.query(*sel).\
             filter(Measurement.date >= start).all()
         temps = list(np.ravel(results))
-        return jsonify(temps=temps)
-    
+        return jsonify(temps)
+
     results = session.query(*sel).\
         filter(Measurement.date >= start).\
         filter(Measurement.date <= end).all()
